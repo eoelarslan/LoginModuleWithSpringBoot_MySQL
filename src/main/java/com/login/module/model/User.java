@@ -24,18 +24,21 @@ import java.time.LocalDate;
 @Table(name = "user")
 public class User extends DataEntity implements Serializable{
 
+    @NotBlank(message = "Please enter the name.")
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotBlank(message = "Please enter the surname.")
     @Column(name = "surname", nullable = false)
     private String surname;
 
 
-    @NotBlank
-    @Email(message = "", regexp = "")
+    @NotBlank(message = "Please enter an email.")
+    @Email(message = "Invalid email.", regexp = "")
     @Column(name = "email", nullable = false)
     private String email;
 
+    @NotBlank(message = "Please enter the postal address.")
     @Column(name = "postal_address", nullable = false)
     private String postalAddress;
 
@@ -54,8 +57,8 @@ public class User extends DataEntity implements Serializable{
     @Column(name = "mail_sent_ts")
     private LocalDate mailSentTime;
 
-    @Column(name = "authentication_token")
-    private String authentication_token;
+    @Column(name = "authenticationToken")
+    private String authenticationToken;
 
     @Column(name = "password", nullable = false)
     private String password;

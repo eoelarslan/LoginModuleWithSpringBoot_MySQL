@@ -1,6 +1,7 @@
 package com.login.module.model;
 
 import com.login.module.model.base.DataEntity;
+import com.login.module.validator.constraint.ValidPassword;
 import lombok.*;
 
 
@@ -9,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -34,7 +36,7 @@ public class User extends DataEntity implements Serializable{
 
 
     @NotBlank(message = "Please enter an email.")
-    @Email(message = "Invalid email.", regexp = "")
+    @Email(message = "Invalid email.", regexp = "^(.+)@(.+)$")
     @Column(name = "email", nullable = false)
     private String email;
 
@@ -60,6 +62,9 @@ public class User extends DataEntity implements Serializable{
     @Column(name = "authenticationToken")
     private String authenticationToken;
 
+
+    @Size(min = 8, max = 30)
+    @ValidPassword
     @Column(name = "password", nullable = false)
     private String password;
 }

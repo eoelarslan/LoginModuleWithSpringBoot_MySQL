@@ -35,7 +35,7 @@ public class LoginService {
 
         String baseAuthTokenSTR = BasicAuthenticationHelper.createBasicAuthToken(eMail, password);
 
-        if(user != null){ //user is created before.
+        if(user != null){ // User is created before.
             return MessageStatus.DUBLICATE_ENTRY;
         }else {
             if (eMail != null && eMail.trim().length() > 0 && password.trim().length() > 0) {

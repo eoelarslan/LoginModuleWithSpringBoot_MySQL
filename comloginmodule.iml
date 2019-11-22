@@ -119,5 +119,9 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-context-support:5.2.1.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: com.sun.mail:jakarta.mail:1.6.4" level="project" />
     <orderEntry type="library" name="Maven: com.sun.activation:jakarta.activation:1.2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.passay:passay:1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.cryptacular:cryptacular:1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.50" level="project" />
+    <orderEntry type="library" name="Maven: com.google.guava:guava:20.0" level="project" />
   </component>
 </module>

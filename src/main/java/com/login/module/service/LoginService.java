@@ -15,7 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Service
@@ -46,7 +46,7 @@ public class LoginService {
                     modelMapper.map(registerRequestDTO, user);
                     user.setUserStatusCode(UserStatus.PASSIVE.getUserStatusCode());
                     user.setLoginModuleCode(LoginModule.MANUEL.getLoginModuleCode());
-                    user.setCreatedTime(LocalDate.now());
+                    user.setCreatedTime(LocalDateTime.now());
 
 
                     if (baseAuthTokenSTR.equals(MessageStatus.BASE_64_NOT_SUPPORTED.toString())) {

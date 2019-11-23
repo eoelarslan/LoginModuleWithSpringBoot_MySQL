@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Created by ersin on 21.11.2019.
@@ -51,20 +52,20 @@ public class User extends DataEntity implements Serializable{
     private int loginModuleCode;
 
     @Column(name = "created_ts", nullable = false)
-    private LocalDate createdTime;
+    private LocalDateTime createdTime;
 
     @Column(name = "updated_ts")
     private LocalDate updatedTime;
 
     @Column(name = "mail_sent_ts")
-    private LocalDate mailSentTime;
+    private LocalDateTime mailSentTime;
 
     @Column(name = "authenticationToken")
     private String authenticationToken;
 
 
-    /*@Size(min = 8, max = 30)
-    @ValidPassword*/
+    @Size(min = 8, max = 30)
+    @ValidPassword
     @Column(name = "password", nullable = false)
     private String password;
 }

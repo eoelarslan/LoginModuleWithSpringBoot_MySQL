@@ -11,7 +11,7 @@ import lombok.ToString;
 public class RegisterRequestDTO {
 
 	private String name;
-	private String lastname;
+	private String surname;
 	private String email;
 	private String password;
 	private String rePassword;

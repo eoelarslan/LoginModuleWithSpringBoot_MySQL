@@ -63,8 +63,8 @@ public class User extends DataEntity implements Serializable{
     private String authenticationToken;
 
 
-    @Size(min = 8, max = 30)
-    @ValidPassword
+    /*@Size(min = 8, max = 30)
+    @ValidPassword*/
     @Column(name = "password", nullable = false)
     private String password;
 }

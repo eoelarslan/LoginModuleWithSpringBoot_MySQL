@@ -15,6 +15,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 
 @Service
 public class LoginService {
@@ -23,7 +25,7 @@ public class LoginService {
     UserRepository userRepository;
 
     @Autowired
-    ModelMapper modelMappper;
+    private ModelMapper modelMapper;
 
     public MessageStatus saveUserAsPassive(RegisterRequestDTO registerRequestDTO, String emailToken)
             throws BadHttpRequest {
@@ -41,9 +43,11 @@ public class LoginService {
             if (eMail != null && eMail.trim().length() > 0 && password.trim().length() > 0) {
                 if (password.equals(rePassword)) {
                     user = new User();
-                    modelMappper.map(registerRequestDTO, user);
+                    modelMapper.map(registerRequestDTO, user);
                     user.setUserStatusCode(UserStatus.PASSIVE.getUserStatusCode());
                     user.setLoginModuleCode(LoginModule.MANUEL.getLoginModuleCode());
+                    user.setCreatedTime(LocalDate.now());
+
 
                     if (baseAuthTokenSTR.equals(MessageStatus.BASE_64_NOT_SUPPORTED.toString())) {
                         return MessageStatus.BASE_64_NOT_SUPPORTED;

@@ -1,20 +1,20 @@
 package com.login.module.exception.model;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by ersin on 19.11.2019.
  */
+@Getter
 public class ApiError {
 
     private HttpStatus status;
     private String message;
     private List<String> errors;
-
-    //
 
     public ApiError() {
         super();
@@ -36,35 +36,6 @@ public class ApiError {
         super();
         this.status = status;
         this.message = message;
-        errors = Arrays.asList(error);
+        errors = Collections.singletonList(error);
     }
-
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(final HttpStatus status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(final String message) {
-        this.message = message;
-    }
-
-    public List<String> getErrors() {
-        return errors;
-    }
-
-    public void setErrors(final List<String> errors) {
-        this.errors = errors;
-    }
-
-    public void setError(final String error) {
-        errors = Arrays.asList(error);
-    }
-
 }

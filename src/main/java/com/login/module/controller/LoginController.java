@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,13 +32,13 @@ import static com.login.module.util.enums.MessageStatus.*;
 public class LoginController {
 
     @Autowired
-    LoginService loginService;
+    private LoginService loginService;
 
     @Autowired
-    MessageHelper messageHelper;
+    private MessageHelper messageHelper;
 
     @Autowired
-    MailServiceHelper mailServiceHelper;
+    private MailServiceHelper mailServiceHelper;
 
     @Autowired
     private UserRepository userRepository;
@@ -66,9 +67,12 @@ public class LoginController {
                 String subject = messageHelper.getMessage("login.register.mail.subject", null);
                 String message = mailServiceHelper.createRegisterMessage("login.register.mail.message",
                         registerRequestDTO.getEmail(), emailToken);
-                mailServiceHelper.sendMail(registerRequestDTO.getEmail(), subject, message);
 
-                /*userList.add(userRepository.findByEmail(registerRequestDTO.getEmail()));*/
+                User user = userRepository.findByEmail(registerRequestDTO.getEmail());
+                user.setMailSentTime(LocalDateTime.now());
+                userRepository.save(user);
+
+                mailServiceHelper.sendMail(registerRequestDTO.getEmail(), subject, message);
 
                 return ResponseEntity.ok().body(new GenericResponseDTO<>(HttpStatus.ACCEPTED,
                         messageHelper.getMessageByMessageStatus(USER_CREATED_AS_PASSIVE, null), null));

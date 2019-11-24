@@ -14,6 +14,7 @@ import com.login.module.util.helper.Base64Helper;
 import com.login.module.util.helper.MailServiceHelper;
 import com.login.module.util.helper.MessageHelper;
 import javassist.tools.web.BadHttpRequest;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import static com.login.module.util.enums.MessageStatus.*;
 
@@ -42,6 +42,9 @@ public class LoginController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     // TODO SESSION WILL BE HANDLED
 
@@ -68,14 +71,14 @@ public class LoginController {
                 String message = mailServiceHelper.createRegisterMessage("login.register.mail.message",
                         registerRequestDTO.getEmail(), emailToken);
 
-                User user = userRepository.findByEmail(registerRequestDTO.getEmail());
-                user.setMailSentTime(LocalDateTime.now());
-                userRepository.save(user);
+                Optional<User> user = userRepository.findByEmail(registerRequestDTO.getEmail());
+                user.get().setMailSentTime(LocalDateTime.now());
+                userRepository.save(user.get());
 
                 mailServiceHelper.sendMail(registerRequestDTO.getEmail(), subject, message);
 
                 return ResponseEntity.ok().body(new GenericResponseDTO<>(HttpStatus.ACCEPTED,
-                        messageHelper.getMessageByMessageStatus(USER_CREATED_AS_PASSIVE, null), null));
+                        messageHelper.getMessageByMessageStatus(USER_CREATED_AS_PASSIVE, null), user.get()));
 
             default:
                 return ResponseEntity.badRequest().body(new GenericResponseDTO<>(HttpStatus.FORBIDDEN,
@@ -101,23 +104,18 @@ public class LoginController {
     @PostMapping(value = "/user/signin")
     public ResponseEntity signIn(@RequestBody SignInRequestDTO signInRequestDTO) {
 
-        List<LoginResponseDTO> userLoginResponse = new ArrayList<>();
+/*        List<LoginResponseDTO> userLoginResponse = new ArrayList<>();*/
         LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
         MessageStatus messageStatus = loginService.userSignIn(signInRequestDTO);
-        User user;
+        Optional<User> user;
 
         switch (messageStatus) {
             case OK:
                 user = userRepository.findByEmail(signInRequestDTO.getEmail());
-
-                loginResponseDTO.setEmail(user.getEmail());
-                loginResponseDTO.setUserId(user.getId());
-                loginResponseDTO.setName(user.getName());
-
-                userLoginResponse.add(loginResponseDTO);
+                modelMapper.map(user.get(), loginResponseDTO);
 
                 return ResponseEntity.ok().body(new GenericResponseDTO<>(HttpStatus.ACCEPTED,
-                        messageHelper.getMessageByMessageStatus(MessageStatus.OK, null), userLoginResponse));
+                        messageHelper.getMessageByMessageStatus(MessageStatus.OK, null), loginResponseDTO));
             default:
                 return ResponseEntity.badRequest().body(new GenericResponseDTO<>(HttpStatus.BAD_REQUEST,
                         messageHelper.getMessageByMessageStatus(AUTH_FAILED, null), null));
@@ -127,9 +125,9 @@ public class LoginController {
     @DeleteMapping("/user/logout")
     public ResponseEntity<?> deleteUser(@RequestBody SignOutRequestDTO signOutRequestDTO) {
 
-        User user = userRepository.findByEmail(signOutRequestDTO.getEmail());
+        Optional<User> user = userRepository.findByEmail(signOutRequestDTO.getEmail());
         // TODO SESSION WILL BE HANDLED
-        if (user != null) {
+        if (user.isPresent()) {
             return ResponseEntity.ok(new GenericResponseDTO<>(HttpStatus.OK, "User Logged Out", null));
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

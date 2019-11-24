@@ -13,7 +13,6 @@ import java.io.IOException;
 public class LoginModuleApplication {
     public static void main(String[] args) throws IOException {
         SpringApplication.run(LoginModuleApplication.class, args);
-        System.out.println("Hello World");
     }
 
     @Bean

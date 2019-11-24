@@ -16,13 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Service
 public class LoginService {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -33,29 +34,29 @@ public class LoginService {
         String rePassword = registerRequestDTO.getRePassword().trim();
         String eMail = registerRequestDTO.getEmail();
 
-        User user = userRepository.findByEmail(eMail);
+        Optional<User> user = userRepository.findByEmail(eMail);
 
         String baseAuthTokenSTR = BasicAuthenticationHelper.createBasicAuthToken(eMail, password);
 
-        if(user != null){ // User is created before.
+        if(user.isPresent()){ // User is created before.
             return MessageStatus.DUBLICATE_ENTRY;
         }else {
             if (eMail != null && eMail.trim().length() > 0 && password.trim().length() > 0) {
                 if (password.equals(rePassword)) {
-                    user = new User();
-                    modelMapper.map(registerRequestDTO, user);
-                    user.setUserStatusCode(UserStatus.PASSIVE.getUserStatusCode());
-                    user.setLoginModuleCode(LoginModule.MANUEL.getLoginModuleCode());
-                    user.setCreatedTime(LocalDateTime.now());
+                    user = Optional.of(new User());
+                    modelMapper.map(registerRequestDTO, user.get());
+                    user.get().setUserStatusCode(UserStatus.PASSIVE.getUserStatusCode());
+                    user.get().setLoginModuleCode(LoginModule.MANUEL.getLoginModuleCode());
+                    user.get().setCreatedTime(LocalDateTime.now());
 
 
                     if (baseAuthTokenSTR.equals(MessageStatus.BASE_64_NOT_SUPPORTED.toString())) {
                         return MessageStatus.BASE_64_NOT_SUPPORTED;
                     } else {
-                        user.setAuthenticationToken(baseAuthTokenSTR);
-                        user.setUserStatusCode(UserStatus.PASSIVE.getUserStatusCode());
-                        user.setAuthenticationToken(emailToken);
-                        userRepository.save(user);
+                        user.get().setAuthenticationToken(baseAuthTokenSTR);
+                        user.get().setUserStatusCode(UserStatus.PASSIVE.getUserStatusCode());
+                        user.get().setAuthenticationToken(emailToken);
+                        userRepository.save(user.get());
                         return MessageStatus.USER_CREATED_AS_PASSIVE;
                     }
 
@@ -70,11 +71,11 @@ public class LoginService {
 
     public MessageStatus saveUserAsActive(String email, String emailToken) {
 
-        User user = userRepository.findByEmail(email);
-        if (user != null) {
-            if (user.getAuthenticationToken().equals(emailToken)) {
-                user.setUserStatusCode(UserStatus.ACTIVE.getUserStatusCode());
-                userRepository.save(user);
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            if (user.get().getAuthenticationToken().equals(emailToken)) {
+                user.get().setUserStatusCode(UserStatus.ACTIVE.getUserStatusCode());
+                userRepository.save(user.get());
                 return MessageStatus.USER_CREATED;
             } else {
                 return MessageStatus.AUTH_FAILED;
@@ -86,11 +87,11 @@ public class LoginService {
 
     public MessageStatus userSignIn(SignInRequestDTO signInRequestDTO) {
 
-        User user = userRepository.findByEmail(signInRequestDTO.getEmail());
+        Optional<User> user = userRepository.findByEmail(signInRequestDTO.getEmail());
 
-        if (user != null) {
-            if (user.getPassword().equals(signInRequestDTO.getPassword())){ // if passwords matched.
-                if (user.getUserStatusCode() == UserStatus.ACTIVE.getUserStatusCode()){ // if user is activated.
+        if (user.isPresent()) {
+            if (user.get().getPassword().equals(signInRequestDTO.getPassword())){ // if passwords matched.
+                if (user.get().getUserStatusCode() == UserStatus.ACTIVE.getUserStatusCode()){ // if user is activated.
                     return MessageStatus.OK;
                 } else {
                     return MessageStatus.USER_NOT_ACTIVATED;

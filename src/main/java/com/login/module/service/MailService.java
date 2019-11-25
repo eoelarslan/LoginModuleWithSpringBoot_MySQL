@@ -1,6 +1,8 @@
-package com.login.module.util.helper;
+package com.login.module.service;
 
 
+import com.login.module.util.helper.Base64Helper;
+import com.login.module.util.helper.MessageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Random;
 
 @Service
-public class MailServiceHelper {
+public class MailService {
 
 
     @Autowired

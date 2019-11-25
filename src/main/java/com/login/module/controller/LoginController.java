@@ -11,7 +11,7 @@ import com.login.module.repository.UserRepository;
 import com.login.module.service.LoginService;
 import com.login.module.util.enums.MessageStatus;
 import com.login.module.util.helper.Base64Helper;
-import com.login.module.util.helper.MailServiceHelper;
+import com.login.module.service.MailService;
 import com.login.module.util.helper.MessageHelper;
 import javassist.tools.web.BadHttpRequest;
 import org.modelmapper.ModelMapper;
@@ -38,7 +38,7 @@ public class LoginController {
     private MessageHelper messageHelper;
 
     @Autowired
-    private MailServiceHelper mailServiceHelper;
+    private MailService mailService;
 
     @Autowired
     private UserRepository userRepository;
@@ -52,7 +52,7 @@ public class LoginController {
     @PostMapping("/register")
     public ResponseEntity createUser(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) throws BadHttpRequest {
 
-        String emailToken = mailServiceHelper.createEmailToken();
+        String emailToken = mailService.createEmailToken();
 
         MessageStatus messageStatus = loginService.saveUserAsPassive(registerRequestDTO, emailToken);
         switch (messageStatus) {
@@ -68,14 +68,14 @@ public class LoginController {
             case USER_CREATED_AS_PASSIVE:
 
                 String subject = messageHelper.getMessage("login.register.mail.subject", null);
-                String message = mailServiceHelper.createRegisterMessage("login.register.mail.message",
+                String message = mailService.createRegisterMessage("login.register.mail.message",
                         registerRequestDTO.getEmail(), emailToken);
 
                 Optional<User> user = userRepository.findByEmail(registerRequestDTO.getEmail());
                 user.get().setMailSentTime(LocalDateTime.now());
                 userRepository.save(user.get());
 
-                mailServiceHelper.sendMail(registerRequestDTO.getEmail(), subject, message);
+                mailService.sendMail(registerRequestDTO.getEmail(), subject, message);
 
                 return ResponseEntity.ok().body(new GenericResponseDTO<>(HttpStatus.ACCEPTED,
                         messageHelper.getMessageByMessageStatus(USER_CREATED_AS_PASSIVE, null), user.get()));
